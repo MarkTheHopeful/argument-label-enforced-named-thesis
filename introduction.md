@@ -113,9 +113,9 @@ Suppose one can use external **argument labels**. In that case, the developer ca
 
 Therefore, the implementation of enforcement of named form of arguments and argument labels can lead to a better experience during function evolution in public APIs.
 
-Another description of a situation, taken directly from the issue discussion:
+Another description of a situation, taken directly from the (issue discussion)[https://youtrack.jetbrains.com/issue/KT-14934/Enforce-parameter-usage-only-in-named-form]:
 
-“Here is an additional use-case. When designing a DSL I might have a function with many params and I know that I will adding more params in the future. If people rely on parameter position, then me adding more parameters may break source compatibility. I was to preserve future source compatibility by forcing all my advanced params to be used in named form only.
+"Here is an additional use-case. When designing a DSL I might have a function with many params and I know that I will adding more params in the future. If people rely on parameter position, then me adding more parameters may break source compatibility. I was to preserve future source compatibility by forcing all my advanced params to be used in named form only.
 
 The related story is for the last lambda parameters that can be used outside of parenthesis. I also want to avoid it being used positionally in such case. However, "forcing its usage in named form" shall still also allow its usage after the closing parenthesis. This way, if I have something like:
 
@@ -129,7 +129,7 @@ and only named usage if forced like this:
 myBuilder(paramI = valI, ...) { ... }
 ```
 
-I can safely add more named params before `body`, still being sure that old sources compile.”
+I can safely add more named params before `body`, still being sure that old sources compile."
 
 ## In general about Swift
 
