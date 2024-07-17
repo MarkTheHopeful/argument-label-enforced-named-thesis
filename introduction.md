@@ -91,14 +91,14 @@ listOf(1, 2, 3, 4).max(by=naturalOrder, or=0) // pretty understandable
 fun <E> List<E>.max(by: Comparator<E>, or: E) {
         E result = or // Ouch!
         for (item in this) {
-                if (**by.compare**(result, item) > 0) { // Ouch!
+                if (by.compare(result, item) > 0) { // Ouch!
                         result = item
                 }
         }
         return result
 }
 // or choose names `comparator` and `zero` for labels
-listOf(1, 2, 3, 4).max(**comparator**=naturalOrder, **zero**=0) // meh...
+listOf(1, 2, 3, 4).max(comparator=naturalOrder, zero=0) // meh...
 ```
 
 Suppose the part of the project you are working on is still in development, so its API is frequently changing. But there are already some uses of the function in the project, and, possibly, not by you, so frequent API changes are not favourable. The worst case is when the function you work on is in some part of a library, and the end users use your library and depend on it.

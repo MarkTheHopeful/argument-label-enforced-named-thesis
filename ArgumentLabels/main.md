@@ -59,7 +59,7 @@ interface Repo {
     fun startRequest(query: String,
                      successAction: () -> Unit,
                      failureAction: (Throwable) -> Unit,
-                     **observeOn: Scheduler**) /* <-- Okay so far... */
+                     observeOn: Scheduler) /* <-- Okay so far... */
 }
 
 // From user's side everything is okay:
@@ -68,7 +68,7 @@ repo.startRequest(
         query = "Foo",
         successAction = { /* ... */ },
         failureAction = { throwable -> /* ... */ },
-        **observeOn = Schedulers.computation()** /* <-- Very clear what this does */
+        observeOn = Schedulers.computation() /* <-- Very clear what this does */
 )
 // But from the developer side things will turn a little bit unobvious
 internal class DefaultRepo : Repo {
@@ -78,7 +78,7 @@ internal class DefaultRepo : Repo {
                               observeOn: Scheduler) {
 
         val disposable = retrofitApi.fooRequest(query = query)
-                **.observeOn(observeOn)** /* who is `observeOn`? (in this particular case we can say that from the type name, but this is not always the case) */
+                .observeOn(observeOn) /* who is `observeOn`? (in this particular case we can say that from the type name, but this is not always the case) */
                 .doOnSuccess(successAction)
                 .doOnError(failureAction)
                 .subscribe()
@@ -90,7 +90,7 @@ repo.startRequest(
         query = "Foo",
         successAction = { /* ... */ },
         failureAction = { throwable -> /* ... */ },
-        **scheduler = Schedulers.computation()** /* what is this scheduler used for? */
+        scheduler = Schedulers.computation() /* what is this scheduler used for? */
 )
 ```
 
