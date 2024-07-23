@@ -151,6 +151,81 @@ This way, there will not be any problems with calls using the named argument for
 
 Remark: this is not the only possible way to solve this problem. There were several proposed, like [having a special name for unnamed arguments](https://stackoverflow.com/questions/50672203/kotlin-explicitly-unnamed-function-arguments) or [disallowing named form for some arguments](https://youtrack.jetbrains.com/issue/KT-9872/Disallow-calling-a-method-with-named-argument), which shows that the problem itself is something people encounter during their work.
 
+#### Remark: Updating argument label and having many of them
+
+One can notice that this idea solves the problem of renaming during API evolution only partially: you can freely change only the parameter name, but not the argument label. This can be seen in the following example:
+
+```kotlin
+// API v1.0
+fun f(a: Int, b: Int) { ... }
+
+// API v1.1: added more parameters, changed names
+fun f([a] c: Int, [b] d: Int, e: Int = 0, g: Int = 0) { ... }
+```
+
+Even though we can bring the parameter names to consistency (`c, d, e, g`), we cannot really change the argument labels for `a` and `b`, as there may already be named calls with them. Therefore, we either make inconsistent naming with regard to the use of old names, or break the compatibility. But are there any ways to avoid both problems?
+
+There are several ideas on how one can do this:
+
+##### Providing old-to-new renamings
+
+So, we want to support both old and new names, focusing our attention on the new ones. Perhaps we could add a way to mark such redirections as old-new. Considering the previous example from this part, one could write something like the following:
+
+```kotlin
+// API v1.1: added more parameters, changed names
+@old a->c, b->d
+fun f (c: Int, d: Int, e: Int = 0, g: Int = 0) { ... }
+```
+
+The new line, `@old a->c, b->d` can be understood as "if there is value parameter `a` in the function invocation, map it to argument label `c`; if there is value parameter `b` in the function invocation, map it to argument label `d`"
+
+This approach allows us to show, that the function now accepts the new argument labels, but without breaking the compatibility with old usages.
+
+Perhaps this approach can be used to not only rename some of the parameters, but to provide complete renamings of functions along with the parameters, with something like the following:
+
+```kotlin
+fun f ... // as in v1.1
+
+// API v1.2: changed the names completely (with the function name) for increased readability
+fun new_name(new_c: Int, new_d: Int, new_e: Int = 0, new_g: Int = 0) { ... }
+
+@alias f(a, b) -> new_name(new_c, new_d)
+```
+
+This approach rises further questions:
+
+1. In which scope these renamings and aliases should be visible?
+2. Do we really need argument labels for this feature?
+3. How should we handle the collisions between old and new names?
+
+Possible answers to these questions vary.
+
+For the scope, we could have different options: file-specific only, same as "new version" function or with the behaviour of the regular function.
+1. File-specific only: without possibility to import the "old" alias, it looks quite useless, as the deprecated usages are, most likely, located in files different from the one with the declaration of this function. And adding this alias to every place instead of changing the used argument labels does not seem as a good idea.
+2. Exactly the same as "new version": no additional imports are required. This approach allows for backward compatibility out-of-the-box, but the downside is that the old names will be available even at the new place. (However, we could simply not indicate them as candidates in IDE and/or show a warning when using a "deprecated" naming of arguments...)
+3. Regular functions: will require additional import if the original function needs an import. Additional import will be required to add compatibility, but it will be less tedious than the approach from 1.
+
+Another thing to consider is which function to consider "parent". Do we make changes to the main function body and providing aliases to all the old changes, or do we write the main function declaration once and then just add the aliases for all the renamings?
+
+And lastly, should we support multiple renamings? Renamings of renamings? Will that make a tree-like structure of renamings in the code?
+
+```kotlin
+// v1.0
+fun f(a: Int, b: Int) {}
+// v1.1
+@old a->c, b->d
+fun f(c: Int, d: Int, e: Int = 0) {}
+// v1.2
+fun new_name(new_c: Int, new_d: Int, new_e: Int = 0) {}
+@alias f(c, d, e) -> new_name(new_c, new_d, new_e)
+
+// Now f(a, b) -> f(c, d) -> new_name(new_c, new_d)
+```
+
+##### Many argument labels
+
+Just add the posiibility to specify more than one argument label for an argument.
+
 #### Unused arguments
 
 Highly related to the previous topic, [some ask for syntax for nameless parameters](https://youtrack.jetbrains.com/issue/KT-8112/Provide-syntax-for-nameless-parameters). In the original issue, the motivation is to use an "empty" name for unused parameters, catch statements and situations where a function accepts a function with a specific amount of parameters, as seen in the example in [issue KTIJ-10594](https://youtrack.jetbrains.com/issue/KTIJ-10594).
