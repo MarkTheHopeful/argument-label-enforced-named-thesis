@@ -12,7 +12,7 @@ This will require the following modifications to be implemented:
 One possible example of such marking can be achieved by introducing a new parameter keyword (here --- `enf`), as can be seen on the following listing:
 
 ```kotlin
-fun callMe(regular: Int, **enf** enforced: Int) {}
+fun callMe(regular: Int, enf enforced: Int) {}
 
 callMe(30, 566) // Compilation error
 callMe(30, enforced=566) // Compiles
