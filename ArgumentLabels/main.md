@@ -226,6 +226,27 @@ fun new_name(new_c: Int, new_d: Int, new_e: Int = 0) {}
 
 Just add the posiibility to specify more than one argument label for an argument.
 
+With the possibility of having more than one argument label, changing a name will be as easy as just adding a new one to the list, and backward compatibility will be provided automatically, if you decide to keep the previous names. One could even mark the outside label as "the main one" with the others being kept for the compatibility. Perhaps it could look like this:
+
+```kotlin
+// v1.0
+fun f(a: Int, b: Int) {}
+// v1.1
+fun f([c, a] c: Int, [d, b] d: Int, e: Int = 0) {}
+// v1.2
+fun f([new_c, c, a] new_c: Int, [new_d, d, b] new_d: Int, [new_e, e] e: Int = 0) {}
+```
+
+The disadvantage of this approach can clearly be seen in the last example: function declaration becomes huge with all the old names being mentioned every time. Another thing that one can see there, is that this approach does not provide anything related to renaming the functions themselves, only their arguments.
+
+However, perhaps we do not really want to rename functions? Especially since one can keep the old name, making the function's body a call to the function with the new name (possibly, changing the parameter names).
+
+##### Disadvantages of both
+
+The problem stated in the previous approach applies to both of them. If one wants to explicitly support the old names, one will need to write all the supported names somewhere, and the approaches simply differ on how the old names are stored --- "vertically", in a chain of renamings as in the first approach, or "horizontally", all in one list in the function declaration.
+
+Another thing to consider is potential problems with renamings with name collisions. The user will have to keep track on potential name collisions among all the old names. In especially weird cases, one might want to "swap" names of two parameters, but how and whether this should be supported is highly dubious.
+
 #### Unused arguments
 
 Highly related to the previous topic, [some ask for syntax for nameless parameters](https://youtrack.jetbrains.com/issue/KT-8112/Provide-syntax-for-nameless-parameters). In the original issue, the motivation is to use an "empty" name for unused parameters, catch statements and situations where a function accepts a function with a specific amount of parameters, as seen in the example in [issue KTIJ-10594](https://youtrack.jetbrains.com/issue/KTIJ-10594).
