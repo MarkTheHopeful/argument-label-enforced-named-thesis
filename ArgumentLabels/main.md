@@ -279,7 +279,7 @@ One can propose changing the original name to `rawData`, but this can lead to co
 Argument labels can serve as an excellent approach to handle this problem:
 
 ```kotlin
-fun doHeavyLifting(data rawData: Data) {
+fun doHeavyLifting([data] rawData: Data) {
     val data: Data = doSomePreprocessing(rawData)
     // do other stuff using a short and simple name
 }
@@ -717,17 +717,3 @@ Because overloads by argument labels are possible in Swift, and because, in most
 
 It can stem from the same behaviour for methods in the Objective-C language, with each argument starting with the second recommended to have a "joining Argument".
 
-### On aliases for functions and arguments
-
-Maybe at some point, one would like to rename all arguments of a function, but just for one file, to do something like the following:
-
-```kotlin
-fun f(a1: Int, a2: Int, a3: Int) {} //...
-
-alias g(b1, b2, b3) = f(a1, a2, a3) // now g with arguments b1, b2, b3 is the same as f
-alias h(c1) = f(a1) // same as h(c1, a2, a3) = f(a1, a2, a3)
-alias f(d1, d2, d3) = f(a1, a2, a3) // now f has arguments named d1, d2, d3
-alias g(e2) = g(b2) // now g has arguments b1, e2, b3, and still just the call to f
-```
-
-Could any of these be implemented? Why would someone need those? Can we do something like "local renaming of an argument"?
