@@ -253,6 +253,34 @@ Highly related to the previous topic, [some ask for syntax for nameless paramete
 
 With argument labels introduced, empty names can be implemented as either empty (that means, set to a special value, like `_` in Rust, for example) argument labels if one wants to disallow using named form for a parameter (same method, as in Swift), or empty parameter name, to indicate that it is not being used inside the function body.
 
+#### Not-so-trailing lambdas
+
+Suppose you have a function that takes at least two functions as arguments, and these functions can be passed as lambdas. Suppose also that there are situations at which both of these arguments has to be specificed as lambdas and have a meaningful body.
+
+To easily specify a meaningful body for a lambda being passed as the last argument, there is the "trailing lambdas" feature in Kotlin. But it applies to only one function argument, the one being specified the last. But what if we want to specify more than one in such form, without gathering the parenthesis all around?
+
+Perhaps one wild idea could be to introduce "named trailing lambdas" into the language, that is, the ability to specify multiple trailing lambdas with the argument labels specified alongside.
+
+Possible use (invocation) could look like the following:
+
+```kotlin
+foo (...) 
+    onSuccess = {
+        // regular lambda body here
+    }
+    onFail = {
+        // different body here
+    }
+```
+
+which, perhaps, looks better than
+
+```kotlin
+foo (..., { /* onSuccess code here */ }, { /* onFail code here */ }) // the amount of parentheses can increase along with the increased nesting of the calls
+```
+
+Even though this may look confusing, especially if the indentation is ommited, it still can be considered as an idea and as a possible solution to the "two equally meaningful lambdas" problem.
+
 #### Overload by parameter names
 
 Some wish to have the ability to have different functions with the same name and signature, which differ only in the way the arguments are labelled. As mentioned in the issue [KT-43016](https://youtrack.jetbrains.com/issue/KT-43016/Support-method-overloads-on-parameter-names-like-Swift), Swift does have such overload, and, when compiling to Kotlin/Native on iOS with specific annotations, it does work. However, one may think having a feature specific to only one platform is strange. 
