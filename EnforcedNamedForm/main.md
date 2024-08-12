@@ -161,6 +161,16 @@ groupBy(keySelector = {...}, valueSelector = {...})
 
 It would be confusing to pass one of the functional parameters here as a regular parameter and the other as a trailing lambda. Therefore, it can be helpful to prohibit this parameter from being used in the positional form. Perhaps one can mark their function, class or module with a special `no-trailing-lambda` keyword, annotation or compilation flag.
 
+#### Allowing using diffent lambdas as trailing
+
+Currently in Kotlin lambda can only be trailing if it is specificed as last argument of a function. This could create some possible disbalance in situations where you might want to have the opportunity for two different function-arguments to accept a proper lambda. One, for example, can imagine the function accepting the `onSuccess` and `onError` functions as arguments. In some situations you might want to have proper `success` processing, and thus passing it as a trailing lambda, while passing `onError` to some other handler, and in some situations you might want to do the contrary. But as for now, you can only put one argument as the "last" one in the function declaration, thus only one of `onSuccess` and `onError` will be available for "trailing" use.
+
+Perhaps not directly related to the enforcement of named arguments form, but one idea can be suggested for this problem. What if we do it so any lambda can be passed as trailing if all the others are specified in named form? That does solve the situation, and does not create ambiguity, at least not from the compiler side.
+
+The downside of this approach is that the user, reading this code for their first time, would still have to somehow understand what was the name of that last trailing argument. And to deduce, which name is "missing" they would have to read the function declaration anyway.
+
+Nevertheless, the idea and the problem itself can be mentioned and considered.
+
 ### Possible drawbacks
 
 #### Additional clutter on the call sites
