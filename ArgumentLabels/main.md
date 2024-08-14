@@ -315,7 +315,58 @@ fun doHeavyLifting([data] rawData: Data) {
 
 Now, with `data` as an argument label, the end user does not see any `raw` prefix, which could lead to confusion, but the developer sees it and can use the identifier `data` for further use as an argument label do not go into the function body scope.
 
-One can say that it can also be solved by introducing mutable arguments, but further discussion is required on whether it is an acceptable pattern to implement.
+##### Different ways to solve this specific problem
+
+Even though we have seen a way to solve this problem using argument labels, there are also other ideas that can be implemented to solve this problem without the introduction of argument labels. Although these are not the main focus of this document, it is still necessary to note all of them for possible future use and development.
+
+###### Mutable arguments
+
+One can say that it can also be solved by introducing mutable arguments, but further discussion is required on whether it is an acceptable pattern to implement. Currently, arguments are considered `val`s, and thus immutable. Putting `var` for a function argument is currently prohibited. Perhaps this behaviour could be changed.
+
+###### Shadowing argument names
+
+What is interesting, currently one can shadow (and, effectively, override) function arguments with new variables, as following:
+
+```kotlin
+fun f(a: Int) {
+    var a: String = "Shadowed!"
+    println(a)
+}
+```
+
+This code compiles and works, thus allowing any argument in a function to be shadowed by a variable inside the function body. However, trying to shadow an already present variable in body by a different variable with the same name produces a compilation error.
+
+Furthermore, when you try to do so in a constructor, you will get a compilation error too!
+
+```kotlin
+class A(val a: String) { // Conflicting declarations: val a: Int
+    val a: Int = 100 // Conflicting declarations: val a: String
+}
+```
+
+This behaviour may look like an inconsistency. Perhaps it could be useful to prohibit such shadowing in function bodies as well? This would break existing code, though. Maybe it would be possible to introduce a mechanism to explicitly mark an argument as "accepting shadowing"? Or perhaps this could be done on the level of variables? Perhaps these ideas require more further discussion.
+
+###### Move the processing out from the function body
+
+When we were talking about processing, the processing itself usually was quite simple and was present on the first line. 
+
+```kotlin
+fun doHeavyLifting([data] rawData: Data) {
+    val data: Data = doSomePreprocessing(rawData)
+    // do other stuff using a short and simple name
+}
+```
+
+Perhaps instead of introducing argument labels one could simply move such processing outside of the function body and put it somewhere outside (preferably still close to the declaration). One could come with different ideas for how it should look, with annotations or a new syntax, and we will provide a possible example here:
+
+```kotlin
+@process(data, doSomePreprocessing)
+fun doHeavyLifting(data: Data) {
+    // data is already processed!
+}
+```
+
+This might bring additional problems in situations where the data processing operation changes the type of given variable, as it may become unclear, why an argument `data` has type `A` on the outside, but type `B` from the inside. Still, it might look better for some cases, and can also be discussed at some point.
 
 ### Possible drawbacks
 
